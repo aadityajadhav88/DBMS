@@ -1,0 +1,42 @@
+use schoolLab4
+
+db.teachers.insertMany([
+  { Tname: "Praveen", dno: 101, dname: "Computer", experience: 5, salary: 12000, date_of_joining: ISODate("2020-01-15") },
+  { Tname: "Sneha", dno: 102, dname: "IT", experience: 3, salary: 10000, date_of_joining: ISODate("2021-03-10") },
+  { Tname: "Amit", dno: 103, dname: "E&TC", experience: 4, salary: 11000, date_of_joining: ISODate("2019-07-20") },
+  { Tname: "Rohit", dno: 104, dname: "Computer", experience: 2, salary: 9000, date_of_joining: ISODate("2022-06-05") }
+])
+
+db.students.insertMany([
+  { Sname: "Neha", roll_no: 1, class: "X" },
+  { Sname: "Riya", roll_no: 2, class: "XI" },
+  { Sname: "Vikas", roll_no: 3, class: "XII" },
+  { Sname: "Aman", roll_no: 4, class: "X" }
+])
+
+db.teachers.find().sort({ Tname: 1 })
+
+db.teachers.find({ dname: "Computer" })
+
+db.teachers.find({ dname: { $in: ["Computer", "IT", "E&TC"] } })
+
+db.teachers.find({ dname: { $in: ["Computer", "IT", "E&TC"] }, salary: { $gte: 10000 } })
+
+db.students.find({ $or: [ { roll_no: 2 }, { Sname: "xyz" } ] })
+
+db.teachers.updateOne(
+  { Tname: "Praveen" },
+  { $set: { experience: 10 } },
+  { upsert: true }
+)
+
+db.teachers.updateMany(
+  { dname: "IT" },
+  { $set: { dname: "COMP" } }
+)
+
+db.teachers.find({}, { Tname: 1, experience: 1, _id: 0 })
+
+db.teachers.deleteMany({ dname: "IT" })
+
+db.teachers.find().sort({ Tname: 1 }).limit(3).pretty()

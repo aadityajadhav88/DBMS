@@ -1,0 +1,25 @@
+use retailLab6
+
+db.customer.insertMany([
+  { cid: 1, cname: "Amit", amount: 250, product_name: "Mouse" },
+  { cid: 2, cname: "Neha", amount: 400, product_name: "Keyboard" },
+  { cid: 1, cname: "Amit", amount: 300, product_name: "Headset" },
+  { cid: 3, cname: "Rohit", amount: 150, product_name: "USB Cable" },
+  { cid: 2, cname: "Neha", amount: 200, product_name: "Mousepad" }
+])
+
+var mapFunc = function() {
+  emit(this.cname, this.amount);
+};
+
+var reduceFunc = function(key, values) {
+  return Array.sum(values);
+};
+
+db.customer.mapReduce(
+  mapFunc,
+  reduceFunc,
+  { out: "customer_total" }
+)
+
+db.customer_total.find()

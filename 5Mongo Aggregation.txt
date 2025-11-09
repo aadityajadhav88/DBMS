@@ -1,0 +1,38 @@
+use BookStore5;
+
+db.booklist.drop();
+
+db.booklist.insertMany([
+  { title: "Dream Sky", author: "Aarav Mehta", genre: "Fiction", price: 450, publish_date: new Date("2019-06-14") },
+  { title: "Secret Code", author: "Neha Sharma", genre: "Mystery", price: 700, publish_date: new Date("2021-03-25") },
+  { title: "Smart World", author: "Karan Patel", genre: "Non-Fiction", price: 550, publish_date: new Date("2018-11-09") },
+  { title: "Lost Planet", author: "Neha Sharma", genre: "Sci-Fi", price: 800, publish_date: new Date("2023-01-05") },
+  { title: "Blue Night", author: "Aarav Mehta", genre: "Fiction", price: 600, publish_date: new Date("2020-09-17") }
+]);
+
+db.booklist.aggregate([
+  { $group: { _id: null, avg_price: { $avg: "$price" } } }
+]);
+
+db.booklist.aggregate([
+  { $group: { _id: "$genre", total_books: { $sum: 1 } } }
+]);
+
+db.booklist.aggregate([
+  { $sort: { price: -1 } },
+  { $group: { _id: "$genre", top_book: { $first: "$title" }, top_price: { $first: "$price" } } }
+]);
+
+db.booklist.aggregate([
+  { $group: { _id: "$author", books_written: { $sum: 1 } } },
+  { $sort: { books_written: -1 } },
+  { $limit: 1 }
+]);
+
+db.booklist.find().sort({ publish_date: -1 });
+
+db.booklist.find().sort({ price: 1 });
+
+db.booklist.createIndex({ title: 1 });
+
+db.booklist.getIndexes();
