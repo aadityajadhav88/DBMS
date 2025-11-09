@@ -1,0 +1,74 @@
+CREATE DATABASE DemoDB;
+
+USE DemoDB;
+
+CREATE TABLE Student (
+    stud_id INT PRIMARY KEY,
+    stud_name VARCHAR(50),
+    dept VARCHAR(30)
+);
+
+CREATE TABLE Course (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50),
+    stud_id INT,
+    FOREIGN KEY (stud_id) REFERENCES Student(stud_id)
+);
+
+INSERT INTO Student (stud_id, stud_name, dept) VALUES
+(1, 'Amit', 'CS'),
+(2, 'Sneha', 'IT'),
+(3, 'Rahul', 'CS');
+
+INSERT INTO Course (course_id, course_name, stud_id) VALUES
+(101, 'DBMS', 1),
+(102, 'Networking', 2),
+(103, 'AI', 1);
+
+SELECT s.stud_name, c.course_name
+FROM Student s
+INNER JOIN Course c ON s.stud_id = c.stud_id;
+
+SELECT s.stud_name, c.course_name
+FROM Student s
+LEFT JOIN Course c ON s.stud_id = c.stud_id;
+
+SELECT s.stud_name, c.course_name
+FROM Student s
+RIGHT JOIN Course c ON s.stud_id = c.stud_id;
+
+SELECT s.stud_name, c.course_name
+FROM Student s
+LEFT JOIN Course c ON s.stud_id = c.stud_id
+UNION
+SELECT s.stud_name, c.course_name
+FROM Student s
+RIGHT JOIN Course c ON s.stud_id = c.stud_id;
+
+SELECT s1.stud_name AS Student1, s2.stud_name AS Student2, s1.dept
+FROM Student s1
+INNER JOIN Student s2 ON s1.dept = s2.dept AND s1.stud_id <> s2.stud_id;
+
+SELECT stud_name
+FROM Student
+WHERE stud_id IN (SELECT stud_id FROM Course);
+
+SELECT course_name
+FROM Course c
+WHERE EXISTS (
+    SELECT 1
+    FROM Student s
+    WHERE s.stud_id = c.stud_id AND s.dept = 'CS'
+);
+
+SELECT stud_name,
+       (SELECT COUNT(*) FROM Course c WHERE c.stud_id = s.stud_id) AS num_courses
+FROM Student s;
+
+CREATE VIEW CS_Students_Courses AS
+SELECT s.stud_name, c.course_name
+FROM Student s
+INNER JOIN Course c ON s.stud_id = c.stud_id
+WHERE s.dept = 'CS';
+
+SELECT * FROM CS_Students_Courses;

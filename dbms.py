@@ -1,0 +1,159 @@
+import mysql.connector
+
+# Function to create a connection
+def create_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="1234",
+        database="employee_db"
+    )
+
+# Function to add a new employee
+def add_employee(first_name, last_name, job_title, department, salary):
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        query = """INSERT INTO employees (first_name, last_name, job_title, department, salary) 
+                   VALUES (%s, %s, %s, %s, %s)"""
+        cursor.execute(query, (first_name, last_name, job_title, department, salary))
+        conn.commit()
+        print(f"Employee {first_name} {last_name} added successfully!")
+    except mysql.connector.Error as e:
+        print("Error:", e)
+    finally:
+        cursor.close()
+        conn.close()
+
+# Function to update employee details
+def update_employee(employee_id, first_name, last_name, job_title, department, salary):
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        query = """UPDATE employees SET first_name = %s, last_name = %s, job_title = %s, 
+                   department = %s, salary = %s WHERE id = %s"""
+        cursor.execute(query, (first_name, last_name, job_title, department, salary, employee_id))
+        conn.commit()
+        print(f"Employee ID {employee_id} updated successfully!")
+    except mysql.connector.Error as e:
+        print("Error:", e)
+    finally:
+        cursor.close()
+        conn.close()
+
+# Function to fetch employee details by ID
+def get_employee_by_id(employee_id):
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM employees WHERE id = %s", (employee_id,))
+        result = cursor.fetchone()
+        if result:
+            print(f"Employee ID: {result[0]}")
+            print(f"Name: {result[1]} {result[2]}")
+            print(f"Job Title: {result[3]}")
+            print(f"Department: {result[4]}")
+            print(f"Salary: ${result[5]:,.2f}")
+        else:
+            print(f"No employee found with ID {employee_id}")
+    except mysql.connector.Error as e:
+        print("Error:", e)
+    finally:
+        cursor.close()
+        conn.close()
+
+# Function to list all employees
+def list_all_employees():
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM employees")
+        results = cursor.fetchall()
+        if results:
+            for row in results:
+                print(f"ID: {row[0]}, Name: {row[1]} {row[2]}, Job Title: {row[3]}, Department: {row[4]}, Salary: ${row[5]:,.2f}")
+        else:
+            print("No employees found.")
+    except mysql.connector.Error as e:
+        print("Error:", e)
+    finally:
+        cursor.close()
+        conn.close()
+
+# Function to delete an employee
+def delete_employee(employee_id):
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM employees WHERE id = %s", (employee_id,))
+        conn.commit()
+        print(f"Employee ID {employee_id} deleted successfully!")
+    except mysql.connector.Error as e:
+        print("Error:", e)
+    finally:
+        cursor.close()
+        conn.close()
+
+# Helper function to get a valid float input
+def get_float_input(prompt):
+    while True:
+        try:
+            return float(input(prompt))
+        except ValueError:
+            print("Invalid input! Please enter a valid number.")
+
+# Helper function to get a valid integer input
+def get_int_input(prompt):
+    while True:
+        try:
+            return int(input(prompt))
+        except ValueError:
+            print("Invalid input! Please enter a valid integer.")
+
+# Main menu
+if __name__ == "__main__":
+    while True:
+        print("\nEmployee Management System")
+        print("1. Add Employee")
+        print("2. Update Employee")
+        print("3. View Employee")
+        print("4. List All Employees")
+        print("5. Delete Employee")
+        print("6. Exit")
+
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            first_name = input("First Name: ")
+            last_name = input("Last Name: ")
+            job_title = input("Job Title: ")
+            department = input("Department: ")
+            salary = get_float_input("Salary: ")
+            add_employee(first_name, last_name, job_title, department, salary)
+
+        elif choice == "2":
+            employee_id = get_int_input("Employee ID: ")
+            first_name = input("First Name: ")
+            last_name = input("Last Name: ")
+            job_title = input("Job Title: ")
+            department = input("Department: ")
+            salary = get_float_input("Salary: ")
+            update_employee(employee_id, first_name, last_name, job_title, department, salary)
+
+        elif choice == "3":
+            employee_id = get_int_input("Employee ID: ")
+            get_employee_by_id(employee_id)
+
+        elif choice == "4":
+            list_all_employees()
+
+        elif choice == "5":
+            employee_id = get_int_input("Employee ID: ")
+            delete_employee(employee_id)
+
+        elif choice == "6":
+            print("Exiting...")
+            break
+
+        else:
+            print("Invalid choice, please try again.")

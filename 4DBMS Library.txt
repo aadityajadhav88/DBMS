@@ -1,0 +1,82 @@
+-- Step 1: Create Database
+CREATE DATABASE db;
+
+-- Step 2: Use Database
+USE db;
+
+-- Step 3: Create Borrower Table
+CREATE TABLE Borrower (
+    Roll_no INT,
+    Name VARCHAR(100),
+    Date_of_Issue DATE,
+    Name_of_Book VARCHAR(100),
+    Status CHAR(1)
+);
+
+-- Step 4: Create Fine Table
+CREATE TABLE Fine (
+    Roll_no INT,
+    Date DATE,
+    Amt DECIMAL(10,2)
+);
+
+INSERT INTO Borrower VALUES (1, 'Shruti', '2025-08-01', 'DBMS Book', 'I');
+INSERT INTO Borrower VALUES (2, 'Amit', '2025-08-20', 'CN Book', 'I');
+INSERT INTO Borrower VALUES (3, 'Rahul', '2025-07-01', 'AI Book', 'I');
+INSERT INTO Borrower VALUES (4, 'Priya', '2025-08-10', 'Civil Book', 'I');
+
+DELIMITER //
+
+CREATE PROCEDURE ReturnBook(IN p_rollno INT, IN p_book VARCHAR(100))
+BEGIN
+    DECLARE v_date_issue DATE;
+    DECLARE v_days INT;
+    DECLARE v_fine INT DEFAULT 0;
+
+    -- Get Date_of_Issue for issued book
+    SELECT Date_of_Issue INTO v_date_issue
+    FROM Borrower
+    WHERE Roll_no = p_rollno
+      AND Name_of_Book = p_book
+      AND Status = 'I'
+    LIMIT 1;
+
+    -- Calculate number of days since issue
+    SET v_days = DATEDIFF(CURDATE(), v_date_issue);
+
+    -- Calculate fine based on rules
+    IF v_days <= 15 THEN
+        SET v_fine = 0;
+    ELSEIF v_days BETWEEN 16 AND 30 THEN
+        SET v_fine = v_days * 5;
+    ELSE
+        SET v_fine = v_days * 50;
+    END IF;
+
+    -- Update Borrower status to 'R'
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE Roll_no = p_rollno
+      AND Name_of_Book = p_book;
+
+    -- Insert into Fine table if fine > 0
+    IF v_fine > 0 THEN
+        INSERT INTO Fine (Roll_no, Date, Amt)
+        VALUES (p_rollno, CURDATE(), v_fine);
+    END IF;
+
+    -- Output message
+    SELECT CONCAT('Book returned. Days: ', v_days, ', Fine: ', v_fine) AS message;
+END //
+
+DELIMITER ;
+
+
+CALL ReturnBook(1, 'DBMS Book');  -- Shruti
+CALL ReturnBook(3, 'AI Book');    -- Rahul
+CALL ReturnBook(2, 'CN Book');    -- Amit
+
+SELECT * FROM Borrower;
+SELECT * FROM Fine;
+
+

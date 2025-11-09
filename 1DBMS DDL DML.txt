@@ -1,0 +1,45 @@
+Part A – DDL
+
+CREATE DATABASE CollegeDB;
+
+USE CollegeDB;
+
+CREATE TABLE Student ( stud_id INT AUTO_INCREMENT PRIMARY KEY, stud_name VARCHAR(50) NOT NULL, dept VARCHAR(30), age INT CHECK (age > 17), email VARCHAR(50) UNIQUE );
+
+CREATE TABLE Course ( course_id INT PRIMARY KEY, course_name VARCHAR(50), stud_id INT, FOREIGN KEY (stud_id) REFERENCES Student(stud_id) );
+
+CREATE VIEW Student_View AS SELECT stud_name, dept FROM Student;
+
+CREATE INDEX idx_dept ON Student(dept);
+------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+Part B – DML
+
+INSERT INTO Student (stud_name, dept, age, email) VALUES ('Amit', 'Computer', 20, 'amit@gmail.com'), ('Sneha', 'IT', 21, 'sneha@gmail.com'), ('Rahul', 'E&TC', 19, 'rahul@gmail.com'), ('Priya', 'Civil', 22, 'priya@gmail.com'), ('Karan', 'Computer', 23, 'karan@gmail.com');
+
+INSERT INTO Course (course_id, course_name, stud_id) VALUES (101, 'DBMS', 1), (102, 'CN', 2), (103, 'AI', 3), (104, 'Civil Eng', 4), (105, 'Networking', 5);
+
+CREATE VIEW stud_synonym AS SELECT * FROM Student;
+
+SELECT * FROM Student;
+
+SELECT * FROM Student_View;
+
+SELECT * FROM stud_synonym;
+
+INSERT INTO Student (stud_name, dept, age, email) VALUES ('Rohit', 'Mechanical', 20, 'rohit@gmail.com');
+
+UPDATE Student SET age = 21 WHERE stud_name = 'Rohit';
+
+DELETE FROM Course WHERE stud_id = 3;  -- Rahul's stud_id
+DELETE FROM Student WHERE stud_name = 'Rahul';
+
+SELECT * FROM Student WHERE dept='Computer';
+
+SELECT dept, COUNT(*) AS total_students FROM Student GROUP BY dept;
+
+SELECT stud_name, age FROM Student WHERE age > 20;
+
+SELECT dept, AVG(age) AS avg_age FROM Student GROUP BY dept;
+
+SELECT * FROM Student ORDER BY stud_name ASC;
