@@ -1,0 +1,47 @@
+DROP DATABASE IF EXISTS StudentDB8;
+CREATE DATABASE StudentDB8;
+USE StudentDB8;
+
+CREATE TABLE Student (
+    Student_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Student_Name VARCHAR(50),
+    Class VARCHAR(20),
+    Address VARCHAR(100)
+);
+
+CREATE TABLE Enrollment (
+    Enroll_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Student_ID INT,
+    Subject_Name VARCHAR(50),
+    Grade CHAR(2),
+    Attendance_Percentage DECIMAL(5,2),
+    FOREIGN KEY (Student_ID) REFERENCES Student(Student_ID)
+);
+
+INSERT INTO Student (Student_Name, Class, Address) VALUES
+('Amit', 'FY', 'Pune'),
+('Sneha', 'SY', 'Mumbai'),
+('Rahul', 'TY', 'Pimpri');
+
+INSERT INTO Enrollment (Student_ID, Subject_Name, Grade, Attendance_Percentage) VALUES
+(1, 'Math', 'A', 95.5),
+(1, 'Science', 'B', 87.0),
+(2, 'Math', 'A', 92.0),
+(2, 'English', 'A', 90.0),
+(3, 'Science', 'C', 75.0);
+
+CREATE VIEW Student_Performance AS
+SELECT s.Student_ID, s.Student_Name, e.Subject_Name, e.Grade, e.Attendance_Percentage
+FROM Student s
+JOIN Enrollment e ON s.Student_ID = e.Student_ID;
+
+CREATE VIEW Attendance_Summary AS
+SELECT s.Student_Name, AVG(e.Attendance_Percentage) AS Avg_Attendance
+FROM Student s
+JOIN Enrollment e ON s.Student_ID = e.Student_ID
+GROUP BY s.Student_Name;
+
+CREATE INDEX idx_student_name ON Student(Student_Name);
+
+SELECT * FROM Student_Performance;
+SELECT * FROM Attendance_Summary;
